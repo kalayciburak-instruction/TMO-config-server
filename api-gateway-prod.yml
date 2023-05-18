@@ -1,0 +1,47 @@
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:9000/eureka
+  instance:
+    instance-id: ${spring.application.name}:${random.value}
+    preferIpAddress: true
+server:
+  port: 9011
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - filters:
+            - RemoveRequestHeader=Cookie
+            # Remove the first path segment from the route so it return /api/v1/** instead of /inventory-service/api/v1/**
+            - StripPrefix=1
+          id: inventory-service
+          predicates:
+            - Path=/inventory-service/api/**, /inventory-service/actuator/prometheus
+            - Method=GET,POST,PUT,DELETE
+          uri: lb://localhost
+
+management:
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://192.168.4.24:9411/api/v2/spans
