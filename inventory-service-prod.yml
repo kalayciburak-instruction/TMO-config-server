@@ -5,25 +5,25 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: http://192.168.4.24:8080/auth/realms/RentACarMicroservice/protocol/openid-connect/certs
+          jwk-set-uri: http://keycloak:8080/auth/realms/RentACarMicroservice/protocol/openid-connect/certs
   datasource:
-    username: postgres
-    password: '12345'
-    url: jdbc:postgresql://localhost:5432/inventorydb-dev
+    username: root
+    password: 12345
+    url: jdbc:mysql://inventorydb:3302/inventorydb?createDatabaseIfNotExist=true
   jpa:
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: org.hibernate.dialect.MySQL5Dialect
     hibernate:
       ddl-auto: update
   kafka:
     producer:
-      bootstrap-servers: http://192.168.4.24:9092
+      bootstrap-servers: http://kafka:9092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     consumer:
       auto-offset-reset: earliest
-      bootstrap-servers: 192.168.4.24:9092
+      bootstrap-servers: kafka:9092
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       properties:
         spring:
@@ -36,7 +36,7 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
     service-url:
-      defaultZone: http://localhost:9000/eureka
+      defaultZone: http://discovery-server:8761/eureka
   instance:
     instance-id: ${spring.application.name}:${random.value}
     preferIpAddress: true
@@ -58,4 +58,4 @@ management:
       probability: 1.0
   zipkin:
     tracing:
-      endpoint: http://192.168.4.24:9411/api/v2/spans
+      endpoint: http://zipkin:9411/api/v2/spans
